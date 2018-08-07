@@ -1,10 +1,8 @@
 {
     "author" : ["Bramble"],
-    "bot_version" : [3,0,0],
-    "description" : "Simple bot updater using popen!",
+    "description" : "Simple bot updater",
     "hidden" : false,
     "install_msg" : "Thank you for adding this cog!",
-    "short" : "Update your bot from discord",
     "requirements": [],
-    "tags" : ["update", "shell"]
+    "tags" : ["update", "updating"]
 }
