@@ -1,5 +1,5 @@
-from .pinginfo import Pinginfo
+from .ping import Ping
 
 
 def setup(bot):
-    bot.add_cog(Pinginfo(bot))
+    bot.add_cog(Ping(bot))
