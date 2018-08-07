@@ -23,4 +23,4 @@ class Updater:
         
         for page in msg:
             await ctx.send("```py\n\n{}```".format(page))
-        await ctx.send("Restart bot to apply update")
+        await ctx.send("Restart bot to apply changes.")
