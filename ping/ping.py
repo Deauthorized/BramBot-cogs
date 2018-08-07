@@ -3,12 +3,13 @@ from discord.ext import commands
 from redbot.core import checks
 
 
-class Ping:
+class Pinginfo:
 
     def __init__(self, bot):
         self.bot = bot
+        self.bot.remove_command("ping")
 
-    @commands.command()
+    @commands.command(aliases=["pinginfo"])
     async def ping(self, ctx):
         """Ping the shard and latency"""
         latencies = self.bot.latencies
