@@ -11,9 +11,9 @@ class Updater:
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command(aliases=["updateme"])
+    @commands.command(aliases=["updater"])
     @commands.is_owner()
-    async def updater(self, ctx):
+    async def update(self, ctx):
         """Attempt to update bot version"""
         await ctx.send("Attemping to update...")
         proc = await asyncio.create_subprocess_shell("redbot-launcher --update-dev", stdin=None, stderr=None, stdout=PIPE)
