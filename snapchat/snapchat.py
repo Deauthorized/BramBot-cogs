@@ -8,7 +8,7 @@ class Snapchat:
 	def __init__(self,bot):
 		self.bot = bot
     
-    @commands.command(pass_context=True, no_pm=False, aliases=["snapcode"])
+	@commands.command(pass_context=True, no_pm=False, aliases=["snapcode"])
 	async def snapchat(self, ctx, *, username):
 		"""View snapcodes!"""
 
