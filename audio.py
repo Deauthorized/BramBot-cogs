@@ -483,7 +483,7 @@ class Audio:
     @commands.command()
     @commands.guild_only()
     async def thumbnail(self, ctx):
-        """Show the current songs thumbnail"""
+        """Show the current song's thumbnail."""
         player = lavalink.get_player(ctx.guild.id)
         thumbnail = player.current.uri.replace("https://www.youtube.com/watch?v=", "")
         embed = discord.Embed()
