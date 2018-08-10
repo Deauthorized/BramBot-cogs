@@ -424,19 +424,23 @@ class Audio:
                 player.current.title, player.current.uri, player.current.requester, arrow, pos, dur
             )
         else:
-            song = "Nothing."
+            song = None
 
         if player.fetch("np_message") is not None:
             try:
                 await player.fetch("np_message").delete()
             except discord.errors.NotFound:
                 pass
-
+        
+        if song is None:
+            thumbnail = ""
+            song = "Nothing."
+        else:
+            thumbnail = player.current.uri.replace("https://www.youtube.com/watch?v=", "")
+        
         embed = discord.Embed(
             title="Now Playing", description=song
         )
-
-        thumbnail = player.current.uri.replace("https://www.youtube.com/watch?v=", "")
         embed.set_thumbnail(url="https://img.youtube.com/vi/{}/mqdefault.jpg".format(thumbnail))
         message = await ctx.send(embed=embed)
         await ctx.embed_colour()
