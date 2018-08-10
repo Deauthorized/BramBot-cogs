@@ -19,7 +19,5 @@ class Avatar:
 			em.set_image(url=user.avatar_url)
 		else:
 			em.set_image(url=user.default_avatar_url)
-		if await ctx.embed_requested():
+            		await ctx.embed_embed()
             		await ctx.send(embed=em)
-		else:
-			await ctx.send(embed=em)
