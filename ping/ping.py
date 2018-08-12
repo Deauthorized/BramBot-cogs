@@ -3,7 +3,7 @@ from discord.ext import commands
 from redbot.core import checks
 
 
-class Pinginfo:
+class Ping:
 
     def __init__(self, bot):
         self.bot = bot
