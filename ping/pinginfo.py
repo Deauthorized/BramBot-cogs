@@ -10,7 +10,7 @@ class Ping:
         self.bot.remove_command("ping")
 
     @commands.command(aliases=["pinginfo"])
-    async def ping(self, ctx):
+    async def pinginfo(self, ctx):
         """Ping the shard and latency"""
         latencies = self.bot.latencies
         msg = ""
