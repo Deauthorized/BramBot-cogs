@@ -15,7 +15,7 @@ from .manager import shutdown_lavalink_server
 
 _ = Translator("Audio", __file__)
 
-__version__ = "0.0.6c"
+__version__ = "0.0.6d"
 __author__ = ["aikaterna", "billy/bollo/ati"]
 
 
@@ -46,6 +46,7 @@ class Audio:
             "notify": False,
             "repeat": False,
             "shuffle": False,
+            "thumbnail": False,
             "volume": 100,
             "vote_enabled": False,
             "vote_percent": 0,
@@ -104,7 +105,12 @@ class Audio:
                     title="Now Playing",
                     description="**[{}]({})**".format(player.current.title, player.current.uri),
                 )
+                if await self.config.guild(notify_channel.guild).thumbnail() and self._thumbnail(
+                    player.current
+                ):
+                    embed.set_thumbnail(url=self._thumbnail(player.current))
                 notify_message = await notify_channel.send(embed=embed)
+                await ctx.embed_colour()
                 player.store("notify_message", notify_message)
 
         if event_type == lavalink.LavalinkEvents.TRACK_START and status:
@@ -161,8 +167,9 @@ class Audio:
                         extra, player.current.title, player.current.uri
                     ),
                 )
-                await ctx.embed_colour()
                 embed.set_footer(text="Skipping...")
+                await ctx.embed_colour()
+                await message_channel.send(embed=embed)
                 await player.skip()
 
     @commands.group()
@@ -266,6 +273,7 @@ class Audio:
         emptydc_timer = data["emptydc_timer"]
         jukebox = data["jukebox"]
         jukebox_price = data["jukebox_price"]
+        thumbnail = data["thumbnail"]
         jarbuild = redbot.core.__version__
 
         vote_percent = data["vote_percent"]
@@ -283,6 +291,8 @@ class Audio:
             "Song notify msgs: [{notify}]\n"
             "Songs as status:  [{status}]\n".format(**global_data, **data)
         )
+        if thumbnail:
+            msg += "Thumbnails:       [{0}]\n".format(thumbnail)
         if vote_percent > 0:
             msg += (
                 "Vote skip:        [{vote_enabled}]\n" "Skip percentage:  [{vote_percent}%]\n"
@@ -297,6 +307,14 @@ class Audio:
         embed = discord.Embed(description=msg)
         await ctx.embed_colour()
         return await ctx.send(embed=embed)
+
+    @audioset.command()
+    @checks.mod_or_permissions(administrator=True)
+    async def thumbnail(self, ctx):
+        """Toggle displaying a thumbnail on audio messages."""
+        thumbnail = await self.config.guild(ctx.guild).thumbnail()
+        await self.config.guild(ctx.guild).thumbnail.set(not thumbnail)
+        await self._embed_msg(ctx, "Thumbnail display: {}.".format(not thumbnail))
 
     @audioset.command()
     @checks.mod_or_permissions(administrator=True)
@@ -424,24 +442,20 @@ class Audio:
                 player.current.title, player.current.uri, player.current.requester, arrow, pos, dur
             )
         else:
-            song = None
+            song = "Nothing."
 
         if player.fetch("np_message") is not None:
             try:
                 await player.fetch("np_message").delete()
             except discord.errors.NotFound:
                 pass
-        
-        if song is None:
-            thumbnail = ""
-            song = "Nothing."
-        else:
-            thumbnail = player.current.uri.replace("https://www.youtube.com/watch?v=", "")
-        
+
         embed = discord.Embed(
             title="Now Playing", description=song
         )
-        embed.set_thumbnail(url="https://img.youtube.com/vi/{}/mqdefault.jpg".format(thumbnail))
+        if await self.config.guild(ctx.guild).thumbnail() and self._thumbnail(player.current):
+            embed.set_thumbnail(url=self._thumbnail(player.current))
+
         message = await ctx.send(embed=embed)
         await ctx.embed_colour()
         player.store("np_message", message)
@@ -483,17 +497,6 @@ class Audio:
         elif react == "next":
             await self._clear_react(message)
             await ctx.invoke(self.skip)
-    
-    @commands.command()
-    @commands.guild_only()
-    async def thumbnail(self, ctx):
-        """Show the current song's thumbnail."""
-        player = lavalink.get_player(ctx.guild.id)
-        thumbnail = player.current.uri.replace("https://www.youtube.com/watch?v=", "")
-        embed = discord.Embed()
-        embed.set_image(url="https://img.youtube.com/vi/{}/mqdefault.jpg".format(thumbnail))
-        await ctx.embed_colour()
-        await ctx.send(embed=embed)
 
     @commands.command(aliases=["resume"])
     @commands.guild_only()
@@ -523,7 +526,7 @@ class Audio:
                 description="**[{}]({})**".format(player.current.title, player.current.uri),
             )
             await ctx.embed_colour()
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
         if player.paused and command != "pause":
             await player.pause(False)
@@ -532,7 +535,7 @@ class Audio:
                 description="**[{}]({})**".format(player.current.title, player.current.uri),
             )
             await ctx.embed_colour()
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
         if player.paused and command == "pause":
             return await self._embed_msg(ctx, "Track is paused.")
@@ -776,7 +779,7 @@ class Audio:
         )
         embed.set_footer(text="{} track(s)".format(track_len))
         await ctx.embed_colour()
-        return await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @playlist.command(name="list")
     async def _playlist_list(self, ctx):
@@ -792,7 +795,7 @@ class Audio:
             description=all_playlists,
         )
         await ctx.embed_colour()
-        return await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.cooldown(1, 15, discord.ext.commands.BucketType.guild)
     @playlist.command(name="queue")
@@ -975,6 +978,7 @@ class Audio:
             embed1 = discord.Embed(
                 title="Please wait, adding tracks..."
             )
+            await ctx.embed_colour()
             playlist_msg = await ctx.send(embed=embed1)
             for song_url in v2_playlist["playlist"]:
                 track = await player.get_tracks(song_url)
@@ -990,6 +994,7 @@ class Audio:
                             track_count, len(v2_playlist["playlist"])
                         ),
                     )
+                    await ctx.embed_colour()
                     await playlist_msg.edit(embed=embed2)
             if not track_list:
                 return await self._embed_msg(ctx, "No tracks found.")
@@ -1108,7 +1113,6 @@ class Audio:
             await ctx.embed_colour()
             await ctx.send(embed=embed)
 
-
     @commands.command(aliases=["q"])
     @commands.guild_only()
     async def queue(self, ctx, page: int = 1):
@@ -1146,7 +1150,7 @@ class Audio:
             dur = lavalink.utils.format_time(player.current.length)
 
         if player.current.is_stream:
-            queue_list += "**Currently livestreaming:** **[{}]({})**\Requested by: **{}**\n\n{}`{}`/`{}`\n\n".format(
+            queue_list += "**Currently livestreaming:** **[{}]({})**\nRequested by: **{}**\n\n{}`{}`/`{}`\n\n".format(
                 player.current.title, player.current.uri, player.current.requester, arrow, pos, dur
             )
         else:
@@ -1157,14 +1161,14 @@ class Audio:
         for i, track in enumerate(
             player.queue[queue_idx_start:queue_idx_end], start=queue_idx_start
         ):
-            if len(track.title) > 39:
+            if len(track.title) > 40:
                 track_title = str(track.title).replace("[", "")
-                track_title = "{}...".format((track_title[:39]).rstrip(" "))
+                track_title = "{}...".format((track_title[:40]).rstrip(" "))
             else:
                 track_title = track.title
             req_user = track.requester
             track_idx = i + 1
-            queue_list += "`{}.` **[{}]({})**, **{}**\n".format(
+            queue_list += "`{}.` **[{}]({})**, requested by **{}**\n".format(
                 track_idx, track_title, track.uri, req_user
             )
 
@@ -1172,8 +1176,8 @@ class Audio:
             title="Queue for " + ctx.guild.name,
             description=queue_list,
         )
-        thumbnail = player.current.uri.replace("https://www.youtube.com/watch?v=", "")
-        embed.set_thumbnail(url="https://img.youtube.com/vi/{}/mqdefault.jpg".format(thumbnail))
+        if await self.config.guild(ctx.guild).thumbnail() and self._thumbnail(player.current):
+            embed.set_thumbnail(url=self._thumbnail(player.current))
         queue_duration = await self._queue_duration(ctx)
         queue_total_duration = lavalink.utils.format_time(queue_duration)
         text = "Page {}/{} | {} tracks, {} remaining".format(
@@ -1277,6 +1281,7 @@ class Audio:
             songembed = discord.Embed(
                 title="Queued {} track(s).".format(len(tracks)),
             )
+            await ctx.embed_colour()
             queue_duration = await self._queue_duration(ctx)
             queue_total_duration = lavalink.utils.format_time(queue_duration)
             if not shuffle and queue_duration > 0:
@@ -1289,9 +1294,7 @@ class Audio:
                 player.add(ctx.author, track)
                 if not player.current:
                     await player.play()
-            await ctx.embed_colour()
             return await ctx.send(embed=songembed)
-
         if query.startswith("sc "):
             query = "scsearch:{}".format(query.replace("sc ", ""))
         elif not query.startswith("http"):
@@ -1637,9 +1640,7 @@ class Audio:
             )
             if not self._player_check(ctx):
                 embed.set_footer(text="Nothing playing.")
-            await ctx.embed_colour()
             return await ctx.send(embed=embed)
-
         if self._player_check(ctx):
             player = lavalink.get_player(ctx.guild.id)
             if (
@@ -1937,6 +1938,14 @@ class Audio:
         for key, value in zip(keys, values):
             track_obj[key] = value
         return track_obj
+
+    @staticmethod
+    def _thumbnail(track):
+        if "youtube" in track.uri:
+            for v, k in track._info.items():
+                if v == "identifier":
+                    return "https://img.youtube.com/vi/{}/mqdefault.jpg".format(k)
+        return None
 
     @staticmethod
     def _userlimit(channel):
