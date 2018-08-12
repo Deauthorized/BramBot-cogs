@@ -16,6 +16,5 @@ class Pinginfo:
         msg = ""
         for shard, pingt in latencies:
             msg += "Shard {}/{}: {}ms\n".format(shard + 1, len(latencies), round(pingt*1000))
-        em = discord.Embed(title=msg)
-        await ctx.embed_colour()
+        em = discord.Embed(title=msg, colour=(await ctx.embed_colour()))
         await ctx.send(embed=em)
