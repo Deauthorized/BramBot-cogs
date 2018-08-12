@@ -104,13 +104,13 @@ class Audio:
                 embed = discord.Embed(
                     title="Now Playing",
                     description="**[{}]({})**".format(player.current.title, player.current.uri),
+                    colour=(await ctx.embed_colour())
                 )
                 if await self.config.guild(notify_channel.guild).thumbnail() and self._thumbnail(
                     player.current
                 ):
                     embed.set_thumbnail(url=self._thumbnail(player.current))
                 notify_message = await notify_channel.send(embed=embed)
-                await ctx.embed_colour()
                 player.store("notify_message", notify_message)
 
         if event_type == lavalink.LavalinkEvents.TRACK_START and status:
@@ -135,9 +135,9 @@ class Audio:
             if notify_channel:
                 notify_channel = self.bot.get_channel(notify_channel)
                 embed = discord.Embed(
-                    title="Queue ended."
+                    title="Queue ended.",
+                    colour=(await ctx.embed_colour())
                 )
-                await ctx.embed_colour()
                 await notify_channel.send(embed=embed)
 
         if event_type == lavalink.LavalinkEvents.QUEUE_END and status:
@@ -166,9 +166,9 @@ class Audio:
                     description="{}\n**[{}]({})**".format(
                         extra, player.current.title, player.current.uri
                     ),
+                    colour=(await ctx.embed_colour())
                 )
                 embed.set_footer(text="Skipping...")
-                await ctx.embed_colour()
                 await message_channel.send(embed=embed)
                 await player.skip()
 
@@ -305,7 +305,6 @@ class Audio:
         ).format(__version__, jarbuild, **global_data)
 
         embed = discord.Embed(description=msg)
-        await ctx.embed_colour()
         return await ctx.send(embed=embed)
 
     @audioset.command()
@@ -375,8 +374,8 @@ class Audio:
         embed = discord.Embed(
             title="Connected in {} servers:".format(server_num),
             description=servers,
+            colour=(await ctx.embed_colour())
         )
-        await ctx.embed_colour()
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -451,13 +450,13 @@ class Audio:
                 pass
 
         embed = discord.Embed(
-            title="Now Playing", description=song
+            title="Now Playing", description=song,
+            colour=(await ctx.embed_colour())
         )
         if await self.config.guild(ctx.guild).thumbnail() and self._thumbnail(player.current):
             embed.set_thumbnail(url=self._thumbnail(player.current))
 
         message = await ctx.send(embed=embed)
-        await ctx.embed_colour()
         player.store("np_message", message)
 
         dj_enabled = await self.config.guild(ctx.guild).dj_enabled()
@@ -524,8 +523,8 @@ class Audio:
             embed = discord.Embed(
                 title="Track Paused",
                 description="**[{}]({})**".format(player.current.title, player.current.uri),
+                colour=(await ctx.embed_colour())
             )
-            await ctx.embed_colour()
             return await ctx.send(embed=embed)
 
         if player.paused and command != "pause":
@@ -533,8 +532,8 @@ class Audio:
             embed = discord.Embed(
                 title="Track Resumed",
                 description="**[{}]({})**".format(player.current.title, player.current.uri),
+                colour=(await ctx.embed_colour())
             )
-            await ctx.embed_colour()
             return await ctx.send(embed=embed)
 
         if player.paused and command == "pause":
@@ -595,8 +594,8 @@ class Audio:
         embed = discord.Embed(
             title="Queued and playing songs:",
             description=queue_user_list,
+            colour=(await ctx.embed_colour())
         )
-        await ctx.embed_colour()
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -655,6 +654,7 @@ class Audio:
             embed = discord.Embed(
                 title="Playlist Enqueued",
                 description="Added {} tracks to the queue.".format(len(tracks)),
+                colour=(await ctx.embed_colour())
             )
             if not shuffle and queue_duration > 0:
                 embed.set_footer(
@@ -670,6 +670,7 @@ class Audio:
             embed = discord.Embed(
                 title="Track Enqueued",
                 description="**[{}]({})**".format(single_track.title, single_track.uri),
+                colour=(await ctx.embed_colour())
             )
             if not shuffle and queue_duration > 0:
                 embed.set_footer(
@@ -681,7 +682,6 @@ class Audio:
                 embed.set_footer(text="#{} in queue".format(len(player.queue)))
             if not player.current:
                 await player.play()
-        await ctx.embed_colour()
         await ctx.send(embed=embed)
 
     @commands.group()
@@ -776,9 +776,9 @@ class Audio:
         embed = discord.Embed(
             title="Playlist info for {}:".format(playlist_name),
             description="Author: **{}**\n{}".format(author_obj, playlist_url),
+            colour=(await ctx.embed_colour())
         )
         embed.set_footer(text="{} track(s)".format(track_len))
-        await ctx.embed_colour()
         await ctx.send(embed=embed)
 
     @playlist.command(name="list")
@@ -794,7 +794,6 @@ class Audio:
             title="Playlists for {}:".format(ctx.guild.name),
             description=all_playlists,
         )
-        await ctx.embed_colour()
         await ctx.send(embed=embed)
 
     @commands.cooldown(1, 15, discord.ext.commands.BucketType.guild)
@@ -915,8 +914,8 @@ class Audio:
             embed = discord.Embed(
                 title="Playlist Enqueued",
                 description="Added {} tracks to the queue.".format(track_count),
+                colour=(await ctx.embed_colour())
             )
-            await ctx.embed_colour()
             await ctx.send(embed=embed)
             if not player.current:
                 await player.play()
@@ -976,9 +975,9 @@ class Audio:
                 except KeyError:
                     pass
             embed1 = discord.Embed(
-                title="Please wait, adding tracks..."
+                title="Please wait, adding tracks...",
+                colour=(await ctx.embed_colour())
             )
-            await ctx.embed_colour()
             playlist_msg = await ctx.send(embed=embed1)
             for song_url in v2_playlist["playlist"]:
                 track = await player.get_tracks(song_url)
@@ -991,10 +990,10 @@ class Audio:
                 if track_count % 5 == 0:
                     embed2 = discord.Embed(
                         title="Loading track {}/{}...".format(
-                            track_count, len(v2_playlist["playlist"])
+                            track_count, len(v2_playlist["playlist"]),
                         ),
+                        colour=(await ctx.embed_colour())
                     )
-                    await ctx.embed_colour()
                     await playlist_msg.edit(embed=embed2)
             if not track_list:
                 return await self._embed_msg(ctx, "No tracks found.")
@@ -1010,9 +1009,9 @@ class Audio:
             else:
                 msg = "Added {} tracks from the {} playlist.".format(track_count, v2_playlist_name)
             embed3 = discord.Embed(
-                title="Playlist Saved", description=msg
+                title="Playlist Saved", description=msg,
+                colour=(await ctx.embed_colour())
             )
-            await ctx.embed_colour()
             await playlist_msg.edit(embed=embed3)
         else:
             await ctx.invoke(self._playlist_save, v2_playlist_name, v2_playlist_url)
@@ -1109,8 +1108,8 @@ class Audio:
             embed = discord.Embed(
                 title="Replaying Track",
                 description="**[{}]({})**".format(player.current.title, player.current.uri),
+                colour=(await ctx.embed_colour())
             )
-            await ctx.embed_colour()
             await ctx.send(embed=embed)
 
     @commands.command(aliases=["q"])
@@ -1175,6 +1174,7 @@ class Audio:
         embed = discord.Embed(
             title="Queue for " + ctx.guild.name,
             description=queue_list,
+            colour=(await ctx.embed_colour())
         )
         if await self.config.guild(ctx.guild).thumbnail() and self._thumbnail(player.current):
             embed.set_thumbnail(url=self._thumbnail(player.current))
@@ -1188,7 +1188,6 @@ class Audio:
         if shuffle:
             text += " | Shuffle: \N{WHITE HEAVY CHECK MARK}"
         embed.set_footer(text=text)
-        await ctx.embed_colour()
         return embed
 
     @commands.command()
@@ -1280,8 +1279,8 @@ class Audio:
                 return await self._embed_msg(ctx, "Nothing found.")
             songembed = discord.Embed(
                 title="Queued {} track(s).".format(len(tracks)),
+                colour=(await ctx.embed_colour())
             )
-            await ctx.embed_colour()
             queue_duration = await self._queue_duration(ctx)
             queue_total_duration = lavalink.utils.format_time(queue_duration)
             if not shuffle and queue_duration > 0:
@@ -1362,6 +1361,7 @@ class Audio:
             embed = discord.Embed(
                 title="Track Enqueued",
                 description="**[{}]({})**".format(search_choice.title, search_choice.uri),
+                colour=(await ctx.embed_colour())
             )
             queue_duration = await self._queue_duration(ctx)
             queue_total_duration = lavalink.utils.format_time(queue_duration)
@@ -1377,7 +1377,6 @@ class Audio:
             player.add(ctx.author, search_choice)
             if not player.current:
                 await player.play()
-            await ctx.embed_colour()
             await ctx.send(embed=embed)
 
         await menu(ctx, search_page_list, SEARCH_CONTROLS)
@@ -1397,12 +1396,12 @@ class Audio:
                 search_track_num, track.title, track.uri
             )
         embed = discord.Embed(
-            title="Tracks Found:", description=search_list
+            title="Tracks Found:", description=search_list,
+            colour=(await ctx.embed_colour())
         )
         embed.set_footer(
             text="Page {}/{} | {} search results".format(page_num, search_num_pages, len(tracks))
         )
-        await ctx.embed_colour()
         return embed
 
     @commands.command()
@@ -1575,22 +1574,23 @@ class Audio:
             time_remain = lavalink.utils.format_time(dur - pos)
             if player.current.is_stream:
                 embed = discord.Embed(
-                    title="There's nothing in the queue."
+                    title="There's nothing in the queue.",
+                    colour=(await ctx.embed_colour())
                 )
                 embed.set_footer(text="Currently livestreaming {}".format(player.current.title))
             else:
                 embed = discord.Embed(
-                    title="There's nothing in the queue."
+                    title="There's nothing in the queue.",
+                    colour=(await ctx.embed_colour())
                 )
                 embed.set_footer(text="{} left on {}".format(time_remain, player.current.title))
-            await ctx.embed_colour()
             return await ctx.send(embed=embed)
 
         embed = discord.Embed(
             title="Track Skipped",
             description="**[{}]({})**".format(player.current.title, player.current.uri),
+            colour=(await ctx.embed_colour())
         )
-        await ctx.embed_colour()
         await ctx.send(embed=embed)
         await player.skip()
 
@@ -1637,6 +1637,7 @@ class Audio:
             embed = discord.Embed(
                 title="Current Volume:",
                 description=str(vol) + "%",
+                colour=(await ctx.embed_colour())
             )
             if not self._player_check(ctx):
                 embed.set_footer(text="Nothing playing.")
@@ -1664,11 +1665,11 @@ class Audio:
             if self._player_check(ctx):
                 await lavalink.get_player(ctx.guild.id).set_volume(vol)
         embed = discord.Embed(
-            title="Volume:", description=str(vol) + "%"
+            title="Volume:", description=str(vol) + "%",
+            colour=(await ctx.embed_colour())
         )
         if not self._player_check(ctx):
             embed.set_footer(text="Nothing playing.")
-        await ctx.embed_colour()
         await ctx.send(embed=embed)
 
     @commands.group(aliases=["llset"])
@@ -1692,7 +1693,6 @@ class Audio:
                 title="External lavalink server: {}.".format(not external),
             )
             embed.set_footer(text="Defaults reset.")
-            await ctx.embed_colour()
             return await ctx.send(embed=embed)
         else:
             await self._embed_msg(ctx, "External lavalink server: {}.".format(not external))
@@ -1703,10 +1703,10 @@ class Audio:
         await self.config.host.set(host)
         if await self._check_external():
             embed = discord.Embed(
-                title="Host set to {}.".format(host)
+                title="Host set to {}.".format(host),
+                colour=(await ctx.embed_colour())
             )
             embed.set_footer(text="External lavalink server set to True.")
-            await ctx.embed_colour()
             await ctx.send(embed=embed)
         else:
             await self._embed_msg(ctx, "Host set to {}.".format(host))
@@ -1718,9 +1718,9 @@ class Audio:
         if await self._check_external():
             embed = discord.Embed(
                 title="Server password set to {}.".format(password),
+                colour=(await ctx.embed_colour())
             )
             embed.set_footer(text="External lavalink server set to True.")
-            await ctx.embed_colour()
             await ctx.send(embed=embed)
         else:
             await self._embed_msg(ctx, "Server password set to {}.".format(password))
@@ -1731,10 +1731,10 @@ class Audio:
         await self.config.rest_port.set(rest_port)
         if await self._check_external():
             embed = discord.Embed(
-                title="REST port set to {}.".format(rest_port)
+                title="REST port set to {}.".format(rest_port),
+                colour=(await ctx.embed_colour())
             )
             embed.set_footer(text="External lavalink server set to True.")
-            await ctx.embed_colour()
             await ctx.send(embed=embed)
         else:
             await self._embed_msg(ctx, "REST port set to {}.".format(rest_port))
@@ -1746,9 +1746,9 @@ class Audio:
         if await self._check_external():
             embed = discord.Embed(
                 title="Websocket port set to {}.".format(ws_port),
+                colour=(await ctx.embed_colour())
             )
             embed.set_footer(text="External lavalink server set to True.")
-            await ctx.embed_colour()
             await ctx.send(embed=embed)
         else:
             await self._embed_msg(ctx, "Websocket port set to {}.".format(ws_port))
@@ -1864,8 +1864,7 @@ class Audio:
 
     @staticmethod
     async def _embed_msg(ctx, title):
-        embed = discord.Embed(title=title)
-        await ctx.embed_colour()
+        embed = discord.Embed(title=title, colour=(await ctx.embed_colour()))
         await ctx.send(embed=embed)
 
     async def _get_playing(self, ctx):
