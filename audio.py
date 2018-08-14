@@ -304,7 +304,7 @@ class Audio:
             "External server:  [{use_external_lavalink}]```"
         ).format(__version__, jarbuild, **global_data)
 
-        embed = discord.Embed(description=msg)
+        embed = discord.Embed(description=msg, colour=(await ctx.embed_colour()))
         return await ctx.send(embed=embed)
 
     @audioset.command()
@@ -793,6 +793,7 @@ class Audio:
         embed = discord.Embed(
             title="Playlists for {}:".format(ctx.guild.name),
             description=all_playlists,
+            colour=(await ctx.embed_colour())
         )
         await ctx.send(embed=embed)
 
