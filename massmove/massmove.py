@@ -23,6 +23,9 @@ class Massmove:
         try:
             print('Starting move on SID: {}'.format(from_channel.guild.id))
             print('Getting copy of current list to move')
+            em = discord.Embed(title="Successfully moved users from **{}** to **{}**".format(from_channel.name, to_channel.name), 
+                colour=(await ctx.embed_colour()))
+            await ctx.send(embed=em)
             voice_list = list(from_channel.members)
             for member in voice_list:
                 await member.move_to(to_channel)
@@ -32,4 +35,3 @@ class Massmove:
             await ctx.send('I have no permission to move members.')
         except discord.HTTPException:
             await ctx.send('A error occured. Please try again')
-
