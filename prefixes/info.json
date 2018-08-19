@@ -1,0 +1,13 @@
+{
+  "author": [
+    "Bramble#001, Red-DiscordBot"
+  ],
+  "description": "Set server prefixes with ease and allow guild admins/managers to edit prefixes",
+  "short": "Set server prefixes with ease",
+  "install_msg" : "Thanks for using my cog!",
+  "tags": [
+    "utility",
+    "core"
+  ],
+  "type": "COG"
+}
