@@ -33,3 +33,20 @@ class Prefixes:
 
         em = discord.Embed(description="Prefix set to `{}`".format(prefix_string), colour=(await ctx.embed_colour()))
         await ctx.send(embed=em)
+    
+    @commands.command()
+    @commands.guild_only()
+    async def prefixes(self, ctx):
+        """List server prefix(es)"""
+
+        if ctx.guild:
+            prefixes = await ctx.bot.db.guild(ctx.guild).prefix()
+        else:
+            prefixes = None
+        if not prefixes:
+            prefixes = await ctx.bot.db.prefix()
+        
+        prefix_string = " ".join(prefixes)
+
+        em = discord.Embed(description="Guild's current prefixes: `{}`".format(prefix_string), colour=(await ctx.embed_colour()))
+        await ctx.send(embed=em)
