@@ -3,7 +3,7 @@ import io
 import os
 import aiohttp
 import discord
-from discord.ext import commands
+from redbot.core import commands
 from redbot.core.utils.chat_formatting import box, pagify
 
 
