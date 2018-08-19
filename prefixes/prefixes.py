@@ -12,6 +12,7 @@ class Prefixes:
     @checks.admin_or_permissions(manage_server=True)
     async def prefix(self, ctx, *prefixes):
         """Sets server prefix(es)"""
+
         if not prefixes:
             await ctx.bot.db.guild(ctx.guild).prefix.set([])
             em = discord.Embed(description="Guild prefixes have been reset.", 
@@ -20,5 +21,15 @@ class Prefixes:
             return
         prefixes = sorted(prefixes, reverse=True)
         await ctx.bot.db.guild(ctx.guild).prefix.set(prefixes)
-        em = discord.Embed(description="Prefix set to `{}`".format(prefixes), colour=(await ctx.embed_colour()))
+
+        if ctx.guild:
+            prefixes = await ctx.bot.db.guild(ctx.guild).prefix()
+        else:
+            prefixes = None
+        if not prefixes:
+            prefixes = await ctx.bot.db.prefix()
+        
+        prefix_string = " ".join(prefixes)
+
+        em = discord.Embed(description="Prefix set to `{}`".format(prefix_string), colour=(await ctx.embed_colour()))
         await ctx.send(embed=em)
