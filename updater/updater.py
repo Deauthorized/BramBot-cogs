@@ -16,7 +16,8 @@ class Updater:
     async def update(self, ctx):
         """Attempt to update bot version"""
         await ctx.send("Attemping to update...")
-        proc = await asyncio.create_subprocess_shell("redbot-launcher --update-dev", stdin=None, stderr=None, stdout=PIPE)
+        proc = await asyncio.create_subprocess_shell("pip3 install -U --process-dependency-links --force-reinstall --user  --no-cache-dir Red-DiscordBot[voice]", 
+                                                     stdin=None, stderr=None, stdout=PIPE)
         out = await proc.stdout.read()
         msg = pagify(out.decode('utf-8'))
         
