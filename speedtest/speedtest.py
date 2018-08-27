@@ -26,7 +26,8 @@ class Speedtest:
         self.messages = {}; print('NOTICE: LOADED SPEEDTEST')
 
     def speed_test(self):
-        return str(subprocess.check_output(['speedtest-cli'], stderr=subprocess.STDOUT))
+        return str(subprocess.check_output(['speedtest-cli'],
+            stderr=subprocess.STDOUT))
 
     @commands.command(no_pm=False)
     @checks.is_owner()
@@ -48,8 +49,8 @@ class Speedtest:
             message_down = '**{}** mbps'.format(download)
             message_up = '**{}** mbps'.format(upload)
             message_ping = '**{}** ms'.format(ping)
-            colour = 0x3d464c
-            embed = discord.Embed(colour=colour, description=message)
+            embed = discord.Embed(colour=(await ctx.embed_colour()), 
+                description=message)
             embed.title = 'Speedtest Results'
             embed.add_field(name='Download', value=message_down)
             embed.add_field(name=' Upload', value=message_up)
