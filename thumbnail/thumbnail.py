@@ -11,8 +11,9 @@ class Thumbnail:
     @commands.guild_only()
     async def thumbnail(self, ctx):
         """Current songs thumbnail"""
+        player = lavalink.get_player(ctx.guild.id)
 
-        if self._player_check(ctx):
+        if self._player_check(ctx) and player.current:
             return await self._embed_msg(ctx)
         
         else:
