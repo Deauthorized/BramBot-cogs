@@ -1,0 +1,8 @@
+{
+    "author" : ["Bramble"],
+    "description" : "Display song's thumbnail",
+    "hidden" : false,
+    "install_msg" : "Use `[p]thumbnail` to display the song's thumbnail",
+    "requirements": [],
+    "tags" : ["audio", "thumbnail"]
+}
