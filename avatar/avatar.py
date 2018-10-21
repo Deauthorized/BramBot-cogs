@@ -2,10 +2,7 @@ import discord
 from redbot.core import commands
 from redbot.core import checks
 
-
-BaseCog = getattr(commands, "Cog", object)
-
-class Avatar(BaseCog):
+class Avatar:
 	"""View a user's avatar"""
 
 	def __init__(self,bot):
