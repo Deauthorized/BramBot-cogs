@@ -2,8 +2,9 @@ import discord
 from redbot.core import checks, commands
 import asyncio
 
+BaseCog = getattr(commands, "Cog", object)
 
-class Massmove:
+class Massmove(BaseCog):
     """Massmove users to another voice channel"""
 
     __author__ = "Kowlin"

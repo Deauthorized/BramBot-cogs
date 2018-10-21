@@ -2,8 +2,9 @@ import discord
 from redbot.core import commands
 from redbot.core import checks
 
+BaseCog = getattr(commands, "Cog", object)
 
-class Snapchat:
+class Snapchat(BaseCog):
     """Share your snapcodes!"""
 
     def __init__(self, bot):
