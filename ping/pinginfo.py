@@ -2,8 +2,9 @@ import discord
 from redbot.core import commands
 from redbot.core import checks
 
+BaseCog = getattr(commands, "Cog", object)
 
-class Pinginfo:
+class Pinginfo(BaseCog):
 
     def __init__(self, bot):
         self.bot = bot

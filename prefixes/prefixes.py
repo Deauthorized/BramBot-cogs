@@ -1,8 +1,9 @@
 import discord
 from redbot.core import checks, commands
 
+BaseCog = getattr(commands, "Cog", object)
 
-class Prefixes:
+class Prefixes(BaseCog):
     def __init__(self, bot):
         self.bot = bot
         self.bot.remove_command("set serverprefix")

@@ -6,8 +6,9 @@ import discord
 from redbot.core import commands
 from redbot.core.utils.chat_formatting import box, pagify
 
+BaseCog = getattr(commands, "Cog", object)
 
-class Emoji:
+class Emoji(BaseCog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -41,7 +42,7 @@ class Emoji:
                     data = await resp.read()
                 file = discord.File(io.BytesIO(data),filename="{}.png".format(emoji_id))
             await ctx.send(file=file)
-    
+
     @commands.command()
     async def oof(self, ctx):
         """oof"""

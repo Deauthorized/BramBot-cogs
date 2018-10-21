@@ -14,8 +14,9 @@ try:
 except ImportError:
     module_avail = False
 
+BaseCog = getattr(commands, "Cog", object)
 
-class Speedtest:
+class Speedtest(BaseCog):
     """Speedtest for your bot's server"""
 
     def __init__(self, bot):
@@ -49,7 +50,7 @@ class Speedtest:
             message_down = '**{}** mbps'.format(download)
             message_up = '**{}** mbps'.format(upload)
             message_ping = '**{}** ms'.format(ping)
-            embed = discord.Embed(colour=(await ctx.embed_colour()), 
+            embed = discord.Embed(colour=(await ctx.embed_colour()),
                 description=message)
             embed.title = 'Speedtest Results'
             embed.add_field(name='Download', value=message_down)

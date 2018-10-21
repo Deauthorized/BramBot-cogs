@@ -2,7 +2,9 @@ import discord
 from redbot.core import commands
 import lavalink
 
-class Thumbnail:
+BaseCog = getattr(commands, "Cog", object)
+
+class Thumbnail(BaseCog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -15,10 +17,10 @@ class Thumbnail:
 
         if self._player_check(ctx) and player.current:
             return await self._embed_msg(ctx)
-        
+
         else:
             return await self._embed_error(ctx)
-    
+
     @staticmethod
     def _player_check(ctx):
         try:
@@ -26,7 +28,7 @@ class Thumbnail:
             return True
         except KeyError:
             return False
-    
+
     @staticmethod
     async def _embed_msg(ctx):
         player = lavalink.get_player(ctx.guild.id)
@@ -42,7 +44,7 @@ class Thumbnail:
             url="https://img.youtube.com/vi/{}/mqdefault.jpg".format(songid)
         )
         await ctx.send(embed=embed)
-    
+
     @staticmethod
     async def _embed_error(ctx):
         embed = discord.Embed(
@@ -51,4 +53,3 @@ class Thumbnail:
             title="No song is currently playing."
         )
         await ctx.send(embed=embed)
-            
