@@ -42,3 +42,38 @@ class Massmove(BaseCog):
             await ctx.send("I have no permission to move members.")
         except discord.HTTPException:
             await ctx.send("A error occured. Please try again")
+
+    @commands.command(pass_context=True)
+    @checks.admin_or_permissions(move_members=True)
+    async def moveall(
+        self, ctx, to_channel: discord.VoiceChannel
+    ):
+        """Moves every user connected to any voice channel in the server to the specified channel"""
+        await self._moveall(ctx, to_channel)
+    
+    async def _moveall(self, ctx, to_channel):
+        try:
+            print("Starting move on SID: {}".format(ctx.guild.id))
+            print("Getting copy of current list to move")
+            em = discord.Embed(
+                title="Successfully moved users from **every channel** to **{}**".format(
+                    to_channel.name
+                ),
+                colour=(await ctx.embed_colour()),
+            )
+            await ctx.send(embed=em)
+            voice_list = []
+            for channel in ctx.guild.channels:
+                if str(channel.type) == "voice":
+                    if channel.members:
+                        for mem in channel.members:
+                            voice_list.append(mem)
+            for member in voice_list:
+                await member.move_to(to_channel)
+                print("Member {} moved to channel {}".format(member.id, to_channel.id))
+                await asyncio.sleep(0.05)
+        except discord.Forbidden:
+            await ctx.send("I have no permission to move members.")
+        except discord.HTTPException:
+            await ctx.send("A error occured. Please try again")
+
